@@ -18,10 +18,14 @@ const shoppingListInDB = ref(database, "shoppingList");
 
 onValue(shoppingListInDB, function (snapshot) {
   clearShoppingList();
-  let itemsArray = Object.entries(snapshot.val());
-  for (let i = 0; i < itemsArray.length; i++) {
-    let currentItem = itemsArray[i];
-    appnedItem(currentItem);
+  if (snapshot.exists()) {
+    let itemsArray = Object.entries(snapshot.val());
+    for (let i = 0; i < itemsArray.length; i++) {
+      let currentItem = itemsArray[i];
+      appnedItem(currentItem);
+    }
+  } else {
+    $("#shopping-list").innerHTML = "No items here... yet";
   }
 });
 $("#add-botton").addEventListener("click", () => {
@@ -38,12 +42,10 @@ function clearInput() {
   $("#input-field").value = "";
 }
 function appnedItem(item) {
-  let itemID = item[0];
-  let itemValue = item[1];
   let newEl = $_("li");
-  newEl.textContent = itemValue;
-  newEl.addEventListener("dbclick", function () {
-    let excatLocationItem = ref(database, `shoppingList/${itemID}`);
+  newEl.textContent = item[1];
+  newEl.addEventListener("dblclick", function () {
+    let excatLocationItem = ref(database, `shoppingList/${item[0]}`);
     remove(excatLocationItem);
   });
   $("#shopping-list").append(newEl);
